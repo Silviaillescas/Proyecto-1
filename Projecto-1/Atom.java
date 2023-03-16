@@ -18,19 +18,12 @@ public class Atom {
        
     }
 
-    /**
-     * @param list 
-     */
     public Atom(List list){
         this.islist = true;
         this.isnull = false;
         this.isnumber = false;
         this.list = list;
     }
-
-    /**
-     * @param atomcopy
-     */
 
     public void copyatom(Atomo atomocopy){
         this.islist = atomocopy.islist;
@@ -42,9 +35,6 @@ public class Atom {
         this.isnull = atomocopy.isnull;
     }
 
-    /**
-     * @param atom 
-     */
     public Atom(String atom) {
 
         try {
@@ -67,9 +57,6 @@ public class Atom {
     }
 
 
-    /**
-     * @param number 
-     */
     public Atom(int number) {
         this.number = number;
         this.isnumber = true;
@@ -78,9 +65,6 @@ public class Atom {
         this.atom = Integer.toString(number);
     }
 
-    /**
-     * @param number
-     */
     public Atom(float number) {
         this.number = number;
         this.isnumber = true;
@@ -89,9 +73,6 @@ public class Atom {
         this.atom = Float.toString(this.number);
     }
 
-    /**
-     * @param isTrue 
-     */
     public Atomo(boolean isTrue) {
         if (isTrue){
             this.isBooleano = true;
@@ -107,9 +88,7 @@ public class Atom {
         }
     }
 
-    /**
-     * @return 
-     */
+
     public float getnumber(){
         if (!this.isnumber)
             return 0;
@@ -117,17 +96,12 @@ public class Atom {
         return this.number;
     }
 
-    /**
-     * @return 
-     */
     public boolean islist(){
 
         return this.islist;
     }
 
-    /**
-     * @return 
-     */
+
     public String toString(){
         if (this.isnull)
             return "NIL";
@@ -138,11 +112,6 @@ public class Atom {
             return this.atom;
     }
 
-    /**
-     * 
-     * @param object 
-     * @return 
-     */
     public boolean equals(Object object){
         Atom otherAtom = (Atom)objeto;
 
@@ -158,11 +127,7 @@ public class Atom {
         return this.atom.compareTo(otherAtom.atom)==0;
     }
 
-    /**
-     * 	
-     * @param substring 
-     * @return 
-     */
+
     public boolean comienzaCon(String substring){
         if ((substring.length()<=this.atom.length()) && (!this.islist)){
             return this.atom.substring(0, substring.length()).compareTo(substring)==0;
@@ -171,10 +136,7 @@ public class Atom {
         return false;
     }
 
-    /**
-     * 
-     * @return 
-     */
+
     public boolean islistwithoperation() {
         if (this.EsLista())
             return (this.list.esOperacion);
@@ -182,16 +144,10 @@ public class Atom {
         return false;
     }
 
-    /**
-     * @return 
-     */
     public boolean isnumber(){
         return this.isnumber;
     }
 
-    /**
-     * @return 
-     */
     public boolean esEntero() {
         if (!this.isnumber)
             return false;
@@ -204,10 +160,6 @@ public class Atom {
         }
     }
 
-
-    /**
-     * @return 
-     */
     public String getTipo() {
         if (this.islist)
             return "Nil";
