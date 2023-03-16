@@ -2,13 +2,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class List extends ArrayList implements List{
+public class Lista extends ArrayList implements List{
 
 
 	public boolean esOperacion;
 
 
-	public List() {
+	public Lista() {
 		super();
 	}
 
@@ -16,11 +16,11 @@ public class List extends ArrayList implements List{
 	 * 
 	 * @param list 
 	 */
-	public List(List list){
+	public Lista(List list){
 		super();
 		
 		if (list == null){
-			list = new List();
+			list = new Lista();
 		}
 		
 		int i = 0;
@@ -34,7 +34,7 @@ public class List extends ArrayList implements List{
 	/**
 	 * @param atomoIngresado 
 	 */
-	public List(Atom atomoIngresado) {
+	public Lista(Atom atomoIngresado) {
 		super();
 		
 		this.add(atomoIngresado);
@@ -115,7 +115,7 @@ public class List extends ArrayList implements List{
 	 * @return 
 	 */
 	public boolean equals(Object listobject){
-		List otherlist = (List)listobject;
+		Lista otherlist = (Lista)listobject;
 		
 		if (this.size()!=otherlist.size())
 			return false;

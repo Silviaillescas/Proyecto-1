@@ -14,12 +14,12 @@ public class Atom {
     public Atom() {
         this.isnull = true;
         this.isnumber = false;
-        this.esLista = false;
+        this.islist = false;
        
     }
 
 
-    public Atom(List list){
+    public Atom(Lista list){
         this.islist = true;
         this.isnull = false;
         this.isnumber = false;
@@ -27,14 +27,14 @@ public class Atom {
     }
 
 
-    public void copyatom(Atomo atomocopy){
-        this.islist = atomocopy.islist;
+    public void copyatom(Atom atomcopy){
+        this.islist = atomcopy.islist;
         this.isnumber = atomcopy.isnumber;
-        this.list = atomocopy.list;
-        this.atom = atomocopy.atom;
-        this.description = atomocopy.description;
-        this.number = atomocopy.number;
-        this.isnull = atomocopy.isnull;
+        this.list = atomcopy.list;
+        this.atom = atomcopy.atom;
+        this.description = atomcopy.description;
+        this.number = atomcopy.number;
+        this.isnull = atomcopy.isnull;
     }
 
     public Atom(String atom) {
@@ -77,7 +77,7 @@ public class Atom {
     }
 
 
-    public Atomo(boolean isTrue) {
+    public Atom(boolean isTrue) {
         if (isTrue){
             this.isBooleano = true;
             this.valorBooleano = true;
@@ -109,7 +109,7 @@ public class Atom {
         if (this.isnull)
             return "NIL";
 
-        if (this.EsLista())
+        if (this.islist())
             return this.list.toString();
         else
             return this.atom;
@@ -117,7 +117,7 @@ public class Atom {
 
 
     public boolean equals(Object object){
-        Atom otherAtom = (Atom)objeto;
+        Atom otherAtom = (Atom)object;
 
         if ((this.isnull) && (otherAtom.isnull))
             return true;
@@ -142,7 +142,7 @@ public class Atom {
 
 
     public boolean islistwithoperation() {
-        if (this.EsLista())
+        if (this.islist())
             return (this.list.esOperacion);
 
         return false;

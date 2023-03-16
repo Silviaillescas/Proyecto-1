@@ -16,12 +16,12 @@ public class Main {
 		while (!salio){
 			prompt.Escuchar(interprete.variablesDelUsuario);
 
-			if (prompt.getUltimaExpresion().trim().compareTo("(exit)")==0){
+			if (prompt.getlastexpression().trim().compareTo("(exit)")==0){
 				salio = true;
 				return;
 			}
 			
-			String ultimaExpresion = prompt.getUltimaExpresion().trim();
+			String ultimaExpresion = prompt.getlastexpression().trim();
 					
 			try {
 			} finally{

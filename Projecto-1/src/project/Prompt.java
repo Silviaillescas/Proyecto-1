@@ -4,7 +4,7 @@ import java.util.StringTokenizer;
 
 public class Prompt {
 
-	private Scanner entrada;
+	private Scanner entry;
 
 	private String lastexpression;
 
@@ -20,9 +20,9 @@ public class Prompt {
 	/**
 	 * @param uservariables
 	 */
-	public void Escuchar(Hashtable<String, Atomo> uservariables) {
+	public void Escuchar(Hashtable<String, Atom> uservariables) {
 
-		System.out.print(numeroDeLinea+" Escriba aqui: ");
+		System.out.print(linenumber+" Escriba aqui: ");
 		
 		String newexpressionn = "";
 		boolean finishedreading = false;
@@ -30,21 +30,21 @@ public class Prompt {
 		int numeroDeParentesisCerrados = 0;
 		
 		do{
-			newexpression += " "+entry.nextLine().replace('\n', ' ');
+			newexpressionn += " "+entry.nextLine().replace('\n', ' ');
 			
-			if (uservariables.containsKey(newexpression.trim())){
+			if (uservariables.containsKey(newexpressionn.trim())){
 				finishedreading = true;
 			}
 				
-			numeroDeParentesisAbiertos = contarCaracterEn('(',newexpression);
-			numeroDeParentesisCerrados = contarCaracterEn(')',newexpression);
+			numeroDeParentesisAbiertos = contarCaracterEn('(',newexpressionn);
+			numeroDeParentesisCerrados = contarCaracterEn(')',newexpressionn);
 			
 			if ((numeroDeParentesisAbiertos == numeroDeParentesisCerrados) && (numeroDeParentesisAbiertos !=0))
 				finishedreading = true;
 			
 		} while (!finishedreading);
 		
-		this.lastexpression = newexpression;
+		this.lastexpression = newexpressionn;
 		this.linenumber++;
 	}
 

@@ -2,7 +2,7 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 
-public class Interpreter {
+public class Interprete {
 
 	// Se declaran las variables
 	Prompt prompt;
@@ -14,7 +14,7 @@ public class Interpreter {
 	/**
 	 * Las diferentes definiciones a utilizar
 	 */
-	public Interpreter(){
+	public Interprete(){
 		definirOperacionesImplementadas();
 		definirPred();
 	}
@@ -103,7 +103,7 @@ public class Interpreter {
 		if ((new Atom(primerToken).comienzaCon("'("))){
 			estaDefiniendoUnaLista = true;
 			atomoDeRespuesta = new Atom(new Lista());
-			atomoDeRespuesta.lista.esOperacion = false;
+			atomoDeRespuesta.list.esOperacion = false;
 
 			int desdeDondeCortar = expresionAParsear.indexOf('(') + 1;
 			int hastaDondeCortar = this.obtenerIndiceDelParentesisQueCierraAlPrimeroEn(expresionAParsear);
@@ -128,20 +128,20 @@ public class Interpreter {
 			
 			if ((!estaDefiniendoUnaLista) && (!esFuncion)){
 
-				return new Atomo();
+				return new Atom();
 			}	
 			
 			if (estaDefiniendoUnaLista){
 				if (!esClausula)
-					atomoDeRespuesta.lista.esOperacion = false;
+					atomoDeRespuesta.list.esOperacion = false;
 				else
-					atomoDeRespuesta.lista.esOperacion = true;
+					atomoDeRespuesta.list.esOperacion = true;
 			}else {
-				atomoDeRespuesta.lista.esOperacion = true;
+				atomoDeRespuesta.list.esOperacion = true;
 			}
 		}		
 
-		if (!atomoDeRespuesta.EsLista())
+		if (!atomoDeRespuesta.islist())
 			return new Atom(expresionAParsear);
 		
 		separador = new StringTokenizer(expresionAParsear);
@@ -155,7 +155,7 @@ public class Interpreter {
 				expresionAParsear = expresionAParsear.substring(desdeDondeCortar);
 				int hastaDondeCortar = this.obtenerIndiceDelParentesisQueCierraAlPrimeroEn(expresionAParsear);
 				String expresionDeLaListaInterna = expresionAParsear.substring(0, hastaDondeCortar+1);
-				Atomo atomoConLaListaInterna = new Atom();
+				Atom atomoConLaListaInterna = new Atom();
 				
 				boolean esDefun = false;
 				boolean esCOND = false;
@@ -163,11 +163,11 @@ public class Interpreter {
 				if (atomoActual.comienzaCon("'("))
 					atomoConLaListaInterna = this.parsearExpresion(expresionDeLaListaInterna, true, esClausula);
 				else {
-					if (atomoDeRespuesta.lista.size() > 0){
-						if (atomoDeRespuesta.EsListaConOperacion()){
-							String operacionDeLaLista = atomoDeRespuesta.lista.getOperacion().toString();
+					if (atomoDeRespuesta.list.size() > 0){
+						if (atomoDeRespuesta.islistwithoperation()){
+							String operacionDeLaLista = atomoDeRespuesta.list.getOperacion().toString();
 
-							if ((operacionDeLaLista.compareToIgnoreCase("defun")==0) && (atomoDeRespuesta.lista.size()==2)){
+							if ((operacionDeLaLista.compareToIgnoreCase("defun")==0) && (atomoDeRespuesta.list.size()==2)){
 								atomoConLaListaInterna = this.parsearExpresion(expresionDeLaListaInterna, true,false);
 								esDefun = true;
 							}
@@ -184,7 +184,7 @@ public class Interpreter {
 					
 				}
 				
-				atomoDeRespuesta.lista.AgregarAlFinal(atomoConLaListaInterna);
+				atomoDeRespuesta.list.AgregarAlFinal(atomoConLaListaInterna);
 				String expresionDespuesDeLaListaInterna = expresionAParsear.substring(hastaDondeCortar + 1);
 				expresionAParsear = expresionDespuesDeLaListaInterna;
 				
@@ -193,11 +193,11 @@ public class Interpreter {
 					separador = new StringTokenizer(expresionDespuesDeLaListaInterna);
 				} else {
 
-					String nombreDeLaFuncion = atomoDeRespuesta.lista.getAtomoEn(1).toString();
+					String nombreDeLaFuncion = atomoDeRespuesta.list.getAtomoEn(1).toString();
 					this.funcionesDelUsuario.put(nombreDeLaFuncion,new Atom());
 					
 					Atom atomoConLaOperacion = this.parsearExpresion(expresionAParsear.trim(), false,false);
-					atomoDeRespuesta.lista.AgregarAlFinal(atomoConLaOperacion);
+					atomoDeRespuesta.list.AgregarAlFinal(atomoConLaOperacion);
 					separador = new StringTokenizer("");
 					
 					this.funcionesDelUsuario.remove(nombreDeLaFuncion);
@@ -211,11 +211,15 @@ public class Interpreter {
 
 					atomoActual = new Atom(atomoActual.toString().substring(1));
 					
-				atomoDeRespuesta.lista.AgregarAlFinal(atomoActual);
+				atomoDeRespuesta.list.AgregarAlFinal(atomoActual);
 			}
 		}
 
 		return atomoDeRespuesta;
+	}
+
+	private boolean esOperacionImplementada(String posibleOperacion){
+		return this.listaOperacionesHaImplementar.existe(new Atom(posibleOperacion));
 	}
 
 	/**
@@ -249,23 +253,23 @@ public class Interpreter {
 	public Atom evaluar(Atom atomoAEvaluar){
 		Atom AtomoDeRespuesta = new Atom();
 
-		if (atomoAEvaluar.esNulo)
+		if (atomoAEvaluar.isnull)
 			return new Atom();
 		
-		if (atomoAEvaluar.EsLista()){
+		if (atomoAEvaluar.islist()){
 
-			Lista listaevaluar = atomoAEvaluar.lista;
+			Lista listaevaluar = atomoAEvaluar.list;
 			
 			if (listaevaluar.esOperacion){
 
 				String operacionDeLaLista = listaevaluar.getOperacion().toString(); 
 				if ((operacionDeLaLista.compareToIgnoreCase("defun")!=0) && (operacionDeLaLista.compareToIgnoreCase("cond")!=0)) 
 					for (int i=0 ; i < listaevaluar.size() ; i++){
-						if (listaevaluar.getAtomoEn(i).EsListaConOperacion()){
+						if (listaevaluar.getAtomoEn(i).islistwithoperation()){
 							Atom listaEvaluada = this.evaluar(listaevaluar.getAtomoEn(i));
 							listaevaluar.remplazarEn_Por(i, listaEvaluada);
 						} else if (this.variablesDelUsuario.containsKey(listaevaluar.getAtomoEn(i).toString())){
-							Atom valorDelAtomo = this.variablesDelUsuario.get(listarvaluar.getAtomoEn(i).toString());						
+							Atom valorDelAtomo = this.variablesDelUsuario.get(listaevaluar.getAtomoEn(i).toString());						
 
 							if (listaevaluar.esOperacion){
 								if (!((i==1) && (listaevaluar.getOperacion().toString().compareTo("setq")==0)))
@@ -298,7 +302,7 @@ public class Interpreter {
 			} else if (operacion.compareToIgnoreCase("/")==0){
 				return this.dividir(listaevaluar);
 			} else if (operacion.compareToIgnoreCase("defun")==0){
-				return this.defun(listaevaluarr);
+				return this.defun(listaevaluar);
 			} else if (this.funcionesDelUsuario.containsKey(operacion)){
 				return this.operarFuncionDelUsuario(listaevaluar);
 			} else if (operacion.compareToIgnoreCase("equal")==0) {
@@ -382,10 +386,10 @@ public class Interpreter {
 			
 			for (int i = 1; i <listaevaluar.size()-1 ; i++){
 				
-				if (!(listaevaluar.getAtomoEn(i).esNumero()))
+				if (!(listaevaluar.getAtomoEn(i).isnumber()))
 					return new Atom();
 				
-				esMenorQue = listaevaluar.getAtomoEn(i).getNumero() < listaevaluar.getAtomoEn(i+1).getNumero();
+				esMenorQue = listaevaluar.getAtomoEn(i).getnumber() < listaevaluar.getAtomoEn(i+1).getnumber();
 				
 				if (!esMenorQue)
 					return new Atom (false);
@@ -399,43 +403,43 @@ public class Interpreter {
 			boolean esMenorIgualQue = true;
 			
 			for (int i = 1; i <listaevaluar.size()-1 ; i++){
-				if (!(listaevaluar.getAtomoEn(i).esNumero()))
+				if (!(listaevaluar.getAtomoEn(i).isnumber()))
                     return new Atom();
 				
-				esMenorIgualQue = listaevaluar.getAtomoEn(i).getNumero() <= listavaeluar.getAtomoEn(i+1).getNumero();
+				esMenorIgualQue = listaevaluar.getAtomoEn(i).getnumber() <= listaevaluar.getAtomoEn(i+1).getnumber();
 				if (!esMenorIgualQue)
 					return new Atom (false);
 			}
 			return new Atom(esMenorIgualQue);
-		} else if (predicadoevaluar.compareTo(">")==0){
+		} else if (predicadoAEvaluar.compareTo(">")==0){
 			if (!(listaevaluar.size() > 1))
                 return new Atom();
 			
 			boolean esMayorQue = true;
 			
-			for (int i = 1; i <listarvaluar.size()-1 ; i++){
+			for (int i = 1; i <listaevaluar.size()-1 ; i++){
 				
-				if (!(listaevaluar.getAtomoEn(i).esNumero()))
+				if (!(listaevaluar.getAtomoEn(i).isnumber()))
                     return new Atom();
 				
-				esMayorQue = listaevaluar.getAtomoEn(i).getNumero() > listaevaluar.getAtomoEn(i+1).getNumero();
+				esMayorQue = listaevaluar.getAtomoEn(i).getnumber() > listaevaluar.getAtomoEn(i+1).getnumber();
 				
 				if (!esMayorQue)
 					return new Atom (false);
 			}
 			
 			return new Atom(esMayorQue);
-		} else if (predicadoevaluar.compareTo(">=")==0){
+		} else if (predicadoAEvaluar.compareTo(">=")==0){
 			if (!(listaevaluar.size() > 1))
                 return new Atom();
 			
 			boolean esMayorIgualQue = true;
 			
 			for (int i = 1; i <listaevaluar.size()-1 ; i++){
-				if (!(listaevaluar.getAtomoEn(i).esNumero()))
+				if (!(listaevaluar.getAtomoEn(i).isnumber()))
                     return new Atom();
 				
-				esMayorIgualQue = listaevaluar.getAtomoEn(i).getNumero() >= listaevaluar.getAtomoEn(i+1).getNumero();
+				esMayorIgualQue = listaevaluar.getAtomoEn(i).getnumber() >= listaevaluar.getAtomoEn(i+1).getnumber();
 				if (!esMayorIgualQue)
 					return new Atom (false);
 			}
@@ -451,7 +455,7 @@ public class Interpreter {
 	 */
 	private boolean esPredicado(String operacion) {
 
-		return this.listaDePredicados.existe(new Atom(operacion));
+		return this.listaDePred.existe(new Atom(operacion));
 	}
 
 	/**
@@ -468,24 +472,24 @@ public class Interpreter {
 		
 		while ((revisandoSubListaIndex < listaevaluar.size()) && (!haEncontradoRespuesta)){
 
-			if (!listaevaluar.getAtomoEn(revisandoSubListaIndex).EsLista()) 
+			if (!listaevaluar.getAtomoEn(revisandoSubListaIndex).islist()) 
 				return new Atom();
 			else {
 				
 			}
 			
-			Lista evaluandoSubLista = listaevaluar.getAtomoEn(revisandoSubListaIndex).lista;
+			Lista evaluandoSubLista = listaevaluar.getAtomoEn(revisandoSubListaIndex).list;
 
 			Atom primerAtomo = evaluandoSubLista.getAtomoEn(0);
 
-			if (!((atomoDeRespuesta.esNulo) && (revisandoSubListaIndex==listaevaluar.size()-1))) {
-				if ((!primerAtomo.EsLista()) && (!this.variablesDelUsuario.containsKey(primerAtomo.toString())))
+			if (!((atomoDeRespuesta.isnull) && (revisandoSubListaIndex==listaevaluar.size()-1))) {
+				if ((!primerAtomo.islist()) && (!this.variablesDelUsuario.containsKey(primerAtomo.toString())))
 					return new Atom();
 			}
 			
 			Atom primerAtomoEvaluado = this.evaluar(primerAtomo);
 
-			if (!primerAtomoEvaluado.esNulo){
+			if (!primerAtomoEvaluado.isnull){
 				haEncontradoRespuesta = true;
 					
 				if (evaluandoSubLista.size() > 1)
@@ -510,7 +514,7 @@ public class Interpreter {
 		if (listaevaluar.size()!=2)
 			return new Atom();
 		
-		return new Atom(listeEvaluar.getAtomoEn(1).getTipo());
+		return new Atom(listaevaluar.getAtomoEn(1).getTipo());
 	}
 
 	/**
@@ -533,7 +537,7 @@ public class Interpreter {
 
 		int numeroDeParametrosQueIngreso = listaevaluar.size()-1;
 		
-		Lista listaDeLosParametros = this.funcionesDelUsuario.get(listaevaluar.getOperacion().toString()).lista.getAtomoEn(0).lista;
+		Lista listaDeLosParametros = this.funcionesDelUsuario.get(listaevaluar.getOperacion().toString()).list.getAtomoEn(0).list;
 		
 		int numeroDeParametrosDeLaFuncion = listaDeLosParametros.size();
 		
@@ -546,10 +550,10 @@ public class Interpreter {
 			mapadeparametrosvalores.put(listaDeLosParametros.getAtomoEn(i-1).toString(), listaevaluar.getAtomoEn(i));
 		}
 
-		Atom atomoDeLaOperacion = this.funcionesDelUsuario.get(listaevaluar.getOperacion().toString()).lista.getAtomoEn(1);
+		Atom atomoDeLaOperacion = this.funcionesDelUsuario.get(listaevaluar.getOperacion().toString()).list.getAtomoEn(1);
 		
-		if (atomoDeLaOperacion.EsLista()){
-			Atom listaAEvaluarConParametrosMapeados = this.mapearParametrosEn(mapadeparametrosvalores, new Atomo(atomoDeLaOperacion.lista)); 
+		if (atomoDeLaOperacion.islist()){
+			Atom listaAEvaluarConParametrosMapeados = this.mapearParametrosEn(mapadeparametrosvalores, new Atom(atomoDeLaOperacion.list)); 
 			return this.evaluar(listaAEvaluarConParametrosMapeados);
 		} else
 			return atomoDeLaOperacion;
@@ -562,13 +566,13 @@ public class Interpreter {
 	 */
 	private Atom mapearParametrosEn(Hashtable<String, Atom> mapadeparametrosvalores, Atom atomoEnDondeMapear){
 
-		Lista listaevaluar = new Lista(atomoEnDondeMapear.lista);
-		listaevaluar.esOperacion = atomoEnDondeMapear.lista.esOperacion;	
+		Lista listaevaluar = new Lista(atomoEnDondeMapear.list);
+		listaevaluar.esOperacion = atomoEnDondeMapear.list.esOperacion;	
 
 		for (int i= 0 ; i < listaevaluar.size(); i++){
 			Atom atomoActual = listaevaluar.getAtomoEn(i);
 			
-			if (atomoActual.EsLista()){
+			if (atomoActual.islist()){
 				listaevaluar.remplazarEn_Por(i,this.mapearParametrosEn(mapadeparametrosvalores, atomoActual));
 			} else{
 				if (mapadeparametrosvalores.containsKey(atomoActual.toString()))
@@ -588,10 +592,10 @@ public class Interpreter {
 		if (listaevaluar.size()!=4)
 			return new Atom();
 		else{
-			if (listaevaluar.getAtomoEn(1).EsLista())
+			if (listaevaluar.getAtomoEn(1).islist())
 				return new Atom();
 
-			if (!listaevaluar.getAtomoEn(2).EsLista())
+			if (!listaevaluar.getAtomoEn(2).islist())
 				return new Atom();	
 			
 		}
@@ -632,11 +636,11 @@ public class Interpreter {
 		boolean todosSonEnteros = true;
 		
 		for (int i=1; i < listaevaluar.size() ; i++){
-			if (listaevaluar.getAtomoEn(i).esNumero()){
+			if (listaevaluar.getAtomoEn(i).isnumber()){
 				if (!listaevaluar.getAtomoEn(i).esEntero())
 					todosSonEnteros = false;
 				
-				suma += listaevaluar.getAtomoEn(i).getNumero();
+				suma += listaevaluar.getAtomoEn(i).getnumber();
 			} else
                 return new Atom();
 		}
@@ -653,19 +657,19 @@ public class Interpreter {
 	 */
 	private Atom restar(Lista listaevaluar){
 		float resta;
-		if (listaevaluar.getAtomoEn(1).esNumero())
-			resta = listaevaluar.getAtomoEn(1).getNumero();
+		if (listaevaluar.getAtomoEn(1).isnumber())
+			resta = listaevaluar.getAtomoEn(1).getnumber();
 		else
 			return new Atom();
 
 		boolean todosSonEnteros = true;
 		
 		for (int i=2; i < listaevaluar.size() ; i++){
-			if (listaevaluar.getAtomoEn(i).esNumero()){
+			if (listaevaluar.getAtomoEn(i).isnumber()){
 				if (!listaevaluar.getAtomoEn(i).esEntero())
 					todosSonEnteros = false;
 				
-				resta -= listaevaluar.getAtomoEn(i).getNumero();
+				resta -= listaevaluar.getAtomoEn(i).getnumber();
 			} else
 				return new Atom();
 		}
@@ -682,15 +686,15 @@ public class Interpreter {
 	 */
 	private Atom dividir(Lista listaevaluar) {
 		float division;
-		if (listaevaluar.getAtomoEn(1).esNumero())
-			division = listaevaluar.getAtomoEn(1).getNumero();
+		if (listaevaluar.getAtomoEn(1).isnumber())
+			division = listaevaluar.getAtomoEn(1).getnumber();
 		else
 			return new Atom();
 		
 		for (int i=2; i < listaevaluar.size() ; i++){
-			if (listaevaluar.getAtomoEn(i).esNumero()){
+			if (listaevaluar.getAtomoEn(i).isnumber()){
 			
-				division /= listaevaluar.getAtomoEn(i).getNumero();
+				division /= listaevaluar.getAtomoEn(i).getnumber();
 			} else
 			    return new Atom();
 		}
@@ -706,11 +710,11 @@ public class Interpreter {
 		boolean todosSonEnteros = true;
 		
 		for (int i=1; i < listaevaluar.size() ; i++){
-			if (listaevaluar.getAtomoEn(i).esNumero()){
+			if (listaevaluar.getAtomoEn(i).isnumber()){
 				if (!listaevaluar.getAtomoEn(i).esEntero())
 					todosSonEnteros = false;
 			
-				Multiplicacion *= listaevaluar.getAtomoEn(i).getNumero();
+				Multiplicacion *= listaevaluar.getAtomoEn(i).getnumber();
 			} else
                 return new Atom();
 		}
@@ -728,13 +732,13 @@ public class Interpreter {
 	public Atom setq(Lista listaevaluar) {
 		
 		if ((listaevaluar.size() != 3))
-            return new Atomo();
+            return new Atom();
 
-		if (((Atomo)listaevaluar.get(1)).EsLista())
-            return new Atomo();
+		if (((Atom)listaevaluar.get(1)).islist())
+            return new Atom();
 
-		String variableDeAsignacion = ((Atomo) listaevaluar.get(1)).toString(); 
-		Atomo atomoAsignado = ((Atomo) listaevaluar.get(2));
+		String variableDeAsignacion = ((Atom) listaevaluar.get(1)).toString(); 
+		Atom atomoAsignado = ((Atom) listaevaluar.get(2));
 
 		atomoAsignado = this.evaluar(atomoAsignado);
 
@@ -753,10 +757,10 @@ public class Interpreter {
 		Lista listaConstruida = new Lista();
 		listaConstruida.AgregarAlFinal(listaevaluar.getAtomoEn(1));
 
-		if (listaevaluar.getAtomoEn(2).EsLista()){
-			for (int i = 0; i < listaevaluar.getAtomoEn(2).lista.size(); i++){
-				if (!listaevaluar.getAtomoEn(2).lista.getAtomoEn(i).esNulo)
-					listaConstruida.AgregarAlFinal(listaevaluar.getAtomoEn(2).lista.getAtomoEn(i));
+		if (listaevaluar.getAtomoEn(2).islist()){
+			for (int i = 0; i < listaevaluar.getAtomoEn(2).list.size(); i++){
+				if (!listaevaluar.getAtomoEn(2).list.getAtomoEn(i).isnull)
+					listaConstruida.AgregarAlFinal(listaevaluar.getAtomoEn(2).list.getAtomoEn(i));
 			}
 		} else
 			listaConstruida.AgregarAlFinal(listaevaluar.getAtomoEn(2));
@@ -774,7 +778,7 @@ public class Interpreter {
             return new Atom();
 		
 		Atom listaoperanda = this.evaluar(listaevaluar.getAtomoEn(1));
-		return new Atom(listaoperanda.lista.size());
+		return new Atom(listaoperanda.list.size());
 	}
 
 	/**
@@ -785,14 +789,14 @@ public class Interpreter {
 		if (!this.operandoEsLista(listaevaluar))
             return new Atom();
 		
-		Lista listaoperanda = this.evaluar(listaevaluar.getAtomoEn(1)).lista;
+		Lista listaoperanda = this.evaluar(listaevaluar.getAtomoEn(1)).list;
 		
 		if (listaoperanda.estaVacia())
 			return new Atom();
 		
 		Atom primerAtomo = listaoperanda.getAtomoEn(0);
 		
-		if (primerAtomo.EsListaConOperacion())
+		if (primerAtomo.islistwithoperation())
 			primerAtomo = this.evaluar(primerAtomo);
 		
 		return primerAtomo;
@@ -806,7 +810,7 @@ public class Interpreter {
 		if (!this.operandoEsLista(listaevaluar))
             return new Atom();
 		
-		Lista listaoperanda = this.evaluar(listaevaluar.getAtomoEn(1)).lista;
+		Lista listaoperanda = this.evaluar(listaevaluar.getAtomoEn(1)).list;
 		
 		if (listaoperanda.size()<2)
 			return new Atom();
@@ -830,7 +834,7 @@ public class Interpreter {
 		if (this.variablesDelUsuario.containsKey(listaevaluar.getAtomoEn(1).toString()))
 			return true;
 			
-		if (!listaevaluar.getAtomoEn(1).EsLista())
+		if (!listaevaluar.getAtomoEn(1).islist())
 			return false;
 		
 		return listaevaluar.esOperacion;
