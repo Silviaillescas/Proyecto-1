@@ -1,4 +1,4 @@
-ublic class Nodo <H> {
+public class Nodo <H> {
 
 
 	private Object elem;
